@@ -1,0 +1,37 @@
+{
+	"name": "listen",
+	"devDependencies": {
+		"@types/fs-extra": "*",
+		"@types/js-yaml": "^3.12.1",
+		"@types/lodash": "*",
+		"@types/mocha": "*",
+		"@types/node": "*",
+		"@types/promise": "*",
+		"istanbul": "^0.4.5",
+		"mocha": "5.2.0"
+	},
+	"dependencies": {
+		"@types/ali-oss": "^6.0.3",
+		"@types/ws": "^6.0.1",
+		"ali-oss": "^6.1.1",
+		"chalk": "~2.4.1",
+		"commander": "~2.15.1",
+		"fresh-mysql": "^1.0.4",
+		"fs-extra": "~6.0.1",
+		"js-yaml": "^3.12.2",
+		"lodash": "^4.17.10",
+		"log4js": "2.9.0",
+		"mp4": "^0.5.2",
+		"node-dash-client": "^1.0.4",
+		"pm2": "2.10.4",
+		"typescript": "^2.9.2",
+		"ws": "^7.0.1",
+		"yargs": "~11.0.0"
+	},
+	"scripts": {
+		"test": "make test",
+		"test-cov": "make test-cov",
+		"dev": "make dev",
+		"start": "make start"
+	}
+}
