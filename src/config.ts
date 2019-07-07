@@ -1,7 +1,7 @@
 
 /*
  * config.ts
- * Author: 王 羽涵<perterpon.wang@bytedance.com>
+ * Author: perterpon<perterpon@gmail.com>
  * Create: Sun Jul 07 2019 00:06:40 GMT+0800 (CST)
  */
 
@@ -15,6 +15,8 @@ export interface TListenConfig {
     mpds: {[name: string]: string};
     oss: oss.Options;
     ossPrefix: string;
+    wsPort: number;
+    salt: string;
 }
 
 let config: TListenConfig;

@@ -36,8 +36,7 @@ start: build-ts
 	$(PM2) stop all || echo "no running process found"
 	$(PM2) delete all || echo "no running process found"
 	@cd $(DIRNAME)/build && \
-	@# NODE_PATH=$(BUILD_FOLDER) $(PM2) start etc/pm2.config.yaml
-	NODE_PATH=$(BUILD_FOLDER) node src/index.js --env prod
+	NODE_PATH=$(BUILD_FOLDER) $(PM2) start etc/pm2.config.yaml
 	@echo "start success!"
 
 status:
