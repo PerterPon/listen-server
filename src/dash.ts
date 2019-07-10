@@ -6,9 +6,9 @@
  */
 
 import * as Events from 'events';
-import { NodeDashClient } from 'node-dash-client';
+import { NodeDashClient, TFirstFregment } from 'node-dash-client';
 
-import { radioData, TRadioDataItem } from 'src/data';
+import { radioData, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
 import * as oss from 'src/oss';
 
@@ -40,21 +40,27 @@ export class Dash extends Events.EventEmitter {
         console.log(`[DASH] get dash: [${this.dashName}] first fregment success`);
     }
 
-    public async getFirstFregment(): Promise<string> {
+    public async getFirstFregment(): Promise<TListenFirstFregment> {
         const dataItem = radioData.get(this.dashName);
         if (null !== dataItem.firstFregment) {
             return dataItem.firstFregment;
         }
-        const firstFregment: Buffer = await this.dash.getFirstFregment();
+        const firstFregment: TFirstFregment = await this.dash.getFirstFregment();
         const configInfo: config.TListenConfig = config.getConfig();
         const fregmentFileName: string = `${this.dashName}.dash`;
         const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentFileName}`;
-        await oss.putFile(fileName, firstFregment);
+        await oss.putFile(fileName, firstFregment.data);
 
-        const radioDataItem: TRadioDataItem = radioData.get(this.dashName);
-        radioDataItem.firstFregment = fregmentFileName;
+        const listenFirstFregment: TListenFirstFregment = {
+            duration: firstFregment.duration,
+            timescale: firstFregment.timescale,
+            codecs: firstFregment.codecs,
+            mimeType: firstFregment.mimeType,
+            fileName: fileName,
+            sampleRate: firstFregment.sampleRate,
+        };
 
-        dataItem.firstFregment = fregmentFileName;
+        dataItem.firstFregment = listenFirstFregment;
         return dataItem.firstFregment;
     }
 
