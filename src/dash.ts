@@ -86,11 +86,8 @@ export class Dash extends Events.EventEmitter {
                 radioDataItem.mediaFregment.shift();
             }
 
-            console.time('encodeMP3');
             const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData);
-            console.timeEnd('encodeMP3');
 
-            console.log('puting file: ', fileName);
             await oss.putFile(fileName, mp3Data);
             this.emit(EEvent.MEDIA_FREGMENT, this.dashName, fregmentId);
         }
@@ -101,7 +98,7 @@ export class Dash extends Events.EventEmitter {
         const { shmPath } = configInfo;
         const inputFileName: string = path.join(shmPath, name);
         const outputFileName: string = path.join(shmPath, `${name}.mp3`);
-        this.write2SHM(name, data);
+        this.write2SHM(inputFileName, data);
         await this.doEncode(inputFileName, outputFileName);
         const mp3Data: Buffer = fs.readFileSync(outputFileName);
 

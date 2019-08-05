@@ -22,7 +22,7 @@ export async function register(name: string): Promise<TWSEvent> {
         event: EEvent.REGISTER,
         data: {
             firstFregment: item.firstFregment,
-            latestFregment: item.mediaFregment[item.mediaFregment.length - 1],
+            latestFregments: [item.mediaFregment[item.mediaFregment.length - 2], item.mediaFregment[item.mediaFregment.length - 1]],
             baseUrl: `${configInfo.ossPrefix}/${name}`
         }
     }
