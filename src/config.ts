@@ -17,6 +17,7 @@ export interface TListenConfig {
     ossPrefix: string;
     wsPort: number;
     salt: string;
+    shmPath: string;
 }
 
 let config: TListenConfig;

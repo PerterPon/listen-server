@@ -21,4 +21,6 @@ export interface TRadioDataItem {
     mediaFregment: number[];
 };
 
+export const radioFirstFregment: Map<string, TFirstFregment> = new Map();
+
 export const radioData: Map<string, TRadioDataItem> = new Map();

@@ -12,10 +12,12 @@
 	},
 	"dependencies": {
 		"@types/ali-oss": "^6.0.3",
+		"@types/fluent-ffmpeg": "^2.1.10",
 		"@types/ws": "^6.0.1",
 		"ali-oss": "^6.1.1",
 		"chalk": "~2.4.1",
 		"commander": "~2.15.1",
+		"fluent-ffmpeg": "^2.1.2",
 		"fresh-mysql": "^1.0.4",
 		"fs-extra": "~6.0.1",
 		"js-yaml": "^3.12.2",

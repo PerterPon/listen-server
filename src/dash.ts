@@ -7,8 +7,11 @@
 
 import * as Events from 'events';
 import { NodeDashClient, TFirstFregment } from 'node-dash-client';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as ffmpeg from 'fluent-ffmpeg';
 
-import { radioData, TRadioDataItem, TListenFirstFregment } from 'src/data';
+import { radioData, radioFirstFregment, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
 import * as oss from 'src/oss';
 
@@ -51,6 +54,8 @@ export class Dash extends Events.EventEmitter {
         const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentFileName}`;
         await oss.putFile(fileName, firstFregment.data);
 
+        radioFirstFregment.set(this.dashName, firstFregment);
+
         const listenFirstFregment: TListenFirstFregment = {
             duration: firstFregment.duration,
             timescale: firstFregment.timescale,
@@ -73,7 +78,7 @@ export class Dash extends Events.EventEmitter {
         while (true) {
             const mediaData: Buffer = await this.dash.getMediaFregment();
             const fregmentId: number = Math.floor(Date.now() / 1000);
-            const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.m4s`;
+            const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.mp3`;
 
             const radioDataItem: TRadioDataItem = radioData.get(this.dashName);
             radioDataItem.mediaFregment.push(fregmentId);
@@ -81,9 +86,45 @@ export class Dash extends Events.EventEmitter {
                 radioDataItem.mediaFregment.shift();
             }
 
-            await oss.putFile(fileName, mediaData);
+            console.time('encodeMP3');
+            const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData);
+            console.timeEnd('encodeMP3');
+
+            console.log('puting file: ', fileName);
+            await oss.putFile(fileName, mp3Data);
             this.emit(EEvent.MEDIA_FREGMENT, this.dashName, fregmentId);
         }
+    }
+
+    private async encode(name: string, data: Buffer): Promise<Buffer> {
+        const configInfo: config.TListenConfig = config.getConfig();
+        const { shmPath } = configInfo;
+        const inputFileName: string = path.join(shmPath, name);
+        const outputFileName: string = path.join(shmPath, `${name}.mp3`);
+        this.write2SHM(name, data);
+        await this.doEncode(inputFileName, outputFileName);
+        const mp3Data: Buffer = fs.readFileSync(outputFileName);
+
+        fs.unlinkSync(inputFileName);
+        fs.unlinkSync(outputFileName);
+
+        return mp3Data;
+    }
+
+    private doEncode(inputFile: string, outputFile: string): Promise<void> {
+        return new Promise((resolve) => {
+            ffmpeg()
+            .input(inputFile)
+            .output(outputFile)
+            .on('end', resolve)
+            .run();
+        });
+    }
+
+    private write2SHM(fileName: string, data: Buffer): void {
+        const firstFregment: TFirstFregment = radioFirstFregment.get(this.dashName);
+        const bufferFile: Buffer = Buffer.concat([firstFregment.data, data]);
+        fs.writeFileSync(fileName, bufferFile);
     }
 
 }
