@@ -10,6 +10,7 @@ import { NodeDashClient, TFirstFregment } from 'node-dash-client';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as ffmpeg from 'fluent-ffmpeg';
+import * as request from 'request-promise';
 
 import { radioData, radioFirstFregment, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
@@ -54,6 +55,7 @@ export class Dash extends Events.EventEmitter {
         const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentFileName}`;
         await oss.putFile(fileName, firstFregment.data);
 
+
         radioFirstFregment.set(this.dashName, firstFregment);
 
         const listenFirstFregment: TListenFirstFregment = {
@@ -88,7 +90,12 @@ export class Dash extends Events.EventEmitter {
 
             const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData);
 
+            console.time('put OSS file');
             await oss.putFile(fileName, mp3Data);
+            console.timeEnd('put OSS file');
+            console.time('triggger cdn');
+            await this.triggerCDN(fileName);
+            console.timeEnd('triggger cdn');
             this.emit(EEvent.MEDIA_FREGMENT, this.dashName, fregmentId);
         }
     }
@@ -122,6 +129,12 @@ export class Dash extends Events.EventEmitter {
         const firstFregment: TFirstFregment = radioFirstFregment.get(this.dashName);
         const bufferFile: Buffer = Buffer.concat([firstFregment.data, data]);
         fs.writeFileSync(fileName, bufferFile);
+    }
+
+    private async triggerCDN(fileNamePath: string): Promise<void> {
+        const configInfo: config.TListenConfig = config.getConfig();
+        const cdnUrl: string = `${configInfo.cdnDomain}/${fileNamePath}`;
+        await request(cdnUrl);
     }
 
 }

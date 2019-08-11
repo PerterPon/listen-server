@@ -18,6 +18,7 @@ export interface TListenConfig {
     wsPort: number;
     salt: string;
     shmPath: string;
+    cdnDomain: string;
 }
 
 let config: TListenConfig;
