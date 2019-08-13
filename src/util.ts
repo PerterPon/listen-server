@@ -1,7 +1,7 @@
 
 /*
  * util.ts
- * Author: 王 羽涵<perterpon.wang@bytedance.com>
+ * Author: perterpon<perterpon@gmail.com>
  * Create: Tue Aug 13 2019 16:41:00 GMT+0800 (中国标准时间)
  */
 
