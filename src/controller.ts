@@ -18,11 +18,18 @@ export async function register(name: string): Promise<TWSEvent> {
     }
 
     const configInfo: config.TListenConfig = config.getConfig();
+    let firstFregmentIds: number[] = [];
+    const totalMediaLen: number = item.mediaFregment.length;
+    if (2 === totalMediaLen) {
+        firstFregmentIds = [item.mediaFregment[0]];
+    } else if (3 <= totalMediaLen) {
+        firstFregmentIds = [item.mediaFregment[totalMediaLen - 2], item.mediaFregment[totalMediaLen - 3]];
+    }
     return {
         event: EEvent.REGISTER,
         data: {
             firstFregment: item.firstFregment,
-            latestFregments: [item.mediaFregment[item.mediaFregment.length - 2], item.mediaFregment[item.mediaFregment.length - 1]],
+            latestFregments: firstFregmentIds,
             baseUrl: `${configInfo.ossPrefix}/${name}`
         }
     }

@@ -15,6 +15,7 @@ import * as request from 'request-promise';
 import { radioData, radioFirstFregment, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
 import * as oss from 'src/oss';
+import { sleep } from 'src/util';
 
 import { EEvent } from 'src/enum';
 
@@ -55,7 +56,6 @@ export class Dash extends Events.EventEmitter {
         const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentFileName}`;
         await oss.putFile(fileName, firstFregment.data);
 
-
         radioFirstFregment.set(this.dashName, firstFregment);
 
         const listenFirstFregment: TListenFirstFregment = {
@@ -90,13 +90,17 @@ export class Dash extends Events.EventEmitter {
 
             const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData);
 
-            console.time('put OSS file');
             await oss.putFile(fileName, mp3Data);
-            console.timeEnd('put OSS file');
-            console.time('triggger cdn');
-            await this.triggerCDN(fileName);
-            console.timeEnd('triggger cdn');
-            this.emit(EEvent.MEDIA_FREGMENT, this.dashName, fregmentId);
+            let willEmitFregmentId: number;
+            if (1 === radioDataItem.mediaFregment.length) {
+                willEmitFregmentId = fregmentId;
+            } else {
+                willEmitFregmentId = radioDataItem.mediaFregment[radioDataItem.mediaFregment.length - 1];
+            }
+            this.emit(EEvent.MEDIA_FREGMENT, this.dashName, willEmitFregmentId);
+            this.triggerCDN(fileName);
+            await sleep(500);
+            this.triggerCDN(fileName);
         }
     }
 
