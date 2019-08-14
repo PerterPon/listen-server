@@ -24,7 +24,7 @@
 		"lodash": "^4.17.10",
 		"log4js": "2.9.0",
 		"mp4": "^0.5.2",
-		"node-dash-client": "^1.0.6",
+		"node-dash-client": "^1.1.1",
 		"pm2": "^2.10.4",
 		"typescript": "^3.5.3",
 		"ws": "^7.0.1",

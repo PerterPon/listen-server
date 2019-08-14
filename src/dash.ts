@@ -78,7 +78,7 @@ export class Dash extends Events.EventEmitter {
         this.listening = true;
         const configInfo: config.TListenConfig = config.getConfig();
         while (true) {
-            const mediaData: Buffer = await this.dash.getMediaFregment();
+            const mediaData: {fregmengId: number, data: Buffer} = await this.dash.getMediaFregment();
             const fregmentId: number = Math.floor(Date.now() / 1000);
             const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.mp3`;
 
@@ -88,7 +88,7 @@ export class Dash extends Events.EventEmitter {
                 radioDataItem.mediaFregment.shift();
             }
 
-            const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData);
+            const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData.data);
 
             await oss.putFile(fileName, mp3Data);
             let willEmitFregmentId: number;
