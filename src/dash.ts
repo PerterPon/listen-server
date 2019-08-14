@@ -76,32 +76,36 @@ export class Dash extends Events.EventEmitter {
             return;
         }
         this.listening = true;
-        const configInfo: config.TListenConfig = config.getConfig();
         while (true) {
             const mediaData: {fregmengId: number, data: Buffer} = await this.dash.getMediaFregment();
-            const fregmentId: number = Math.floor(Date.now() / 1000);
-            const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.mp3`;
-
-            const radioDataItem: TRadioDataItem = radioData.get(this.dashName);
-            radioDataItem.mediaFregment.push(fregmentId);
-            if (radioDataItem.mediaFregment.length >= MAX_CACHE_NUM) {
-                radioDataItem.mediaFregment.shift();
-            }
-
-            const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, mediaData.data);
-
-            await oss.putFile(fileName, mp3Data);
-            let willEmitFregmentId: number;
-            if (1 === radioDataItem.mediaFregment.length) {
-                willEmitFregmentId = fregmentId;
-            } else {
-                willEmitFregmentId = radioDataItem.mediaFregment[radioDataItem.mediaFregment.length - 1];
-            }
-            this.emit(EEvent.MEDIA_FREGMENT, this.dashName, willEmitFregmentId);
-            this.triggerCDN(fileName);
-            await sleep(500);
-            this.triggerCDN(fileName);
+            this.onMediaData(mediaData.fregmengId, mediaData.data);
         }
+    }
+
+    private async onMediaData(fregmengId: number, data: Buffer): Promise<void> {
+        const configInfo: config.TListenConfig = config.getConfig();
+        const fregmentId: number = Math.floor(Date.now() / 1000);
+        const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.mp3`;
+
+        const radioDataItem: TRadioDataItem = radioData.get(this.dashName);
+        radioDataItem.mediaFregment.push(fregmentId);
+        if (radioDataItem.mediaFregment.length >= MAX_CACHE_NUM) {
+            radioDataItem.mediaFregment.shift();
+        }
+
+        const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, data);
+
+        await oss.putFile(fileName, mp3Data);
+        let willEmitFregmentId: number;
+        if (1 === radioDataItem.mediaFregment.length) {
+            willEmitFregmentId = fregmentId;
+        } else {
+            willEmitFregmentId = radioDataItem.mediaFregment[radioDataItem.mediaFregment.length - 1];
+        }
+        this.emit(EEvent.MEDIA_FREGMENT, this.dashName, willEmitFregmentId);
+        this.triggerCDN(fileName);
+        await sleep(500);
+        this.triggerCDN(fileName);
     }
 
     private async encode(name: string, data: Buffer): Promise<Buffer> {
