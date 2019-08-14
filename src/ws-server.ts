@@ -25,6 +25,7 @@ export interface TRegisterData {
     timestamp: number;
     sign: string;
     name: string;
+    latestFregmentId: number;
 }
 
 function sleep(time: number): Promise<void> {
@@ -108,7 +109,7 @@ async function onMessage(connection: WebSocket, data: WebSocket.Data): Promise<v
             //TODO: a litte dirty
             const handler = (controllers as any)[event];
             if (true === _.isFunction(handler)) {
-                const resData: any = await handler(name, connection, dataObj.data);
+                const resData: any = await handler(name, dataObj.data, connection);
                 // TODO: excute handler
                 if (false === _.isEmpty(resData)) {
                     connection.send(JSON.stringify(resData));

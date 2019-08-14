@@ -19,7 +19,7 @@ import { sleep } from 'src/util';
 
 import { EEvent } from 'src/enum';
 
-const MAX_CACHE_NUM = 20;
+const MAX_CACHE_NUM = 10;
 
 export class Dash extends Events.EventEmitter {
 
