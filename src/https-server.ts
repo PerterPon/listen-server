@@ -46,6 +46,9 @@ export async function init(): Promise<void> {
 }
 
 function checkSign(timestamp: number, clientSideSign: string): boolean {
+    if (Date.now() - timestamp >= 10 * 1000) {
+        return false;
+    }
     const configInfo: config.TListenConfig = config.getConfig();
     const md5 = crypto.createHash('md5');
     const serverSideSign: string = md5.update(`${configInfo.salt}${timestamp}`).digest('hex');
