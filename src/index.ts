@@ -7,6 +7,7 @@
 
 import * as oss from 'src/oss';
 import * as wsServer from 'src/ws-server';
+import * as httpsServer from 'src/https-server';
 import * as config from 'src/config';
 import { Dash } from 'src/dash';
 import { EEvent } from './enum';
@@ -23,8 +24,9 @@ async function start(): Promise<void> {
     await init();
     await startDashs();
 
+    await httpsServer.init();
     // init websocket server here, to ensure the dash is ready.
-    await wsServer.init();
+    // await wsServer.init();
     console.log('[MAIN] listen server start success!');
 }
 
