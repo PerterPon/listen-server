@@ -11,6 +11,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as ffmpeg from 'fluent-ffmpeg';
 import * as request from 'request-promise';
+import * as crypto from 'crypto';
 
 import { radioData, radioFirstFregment, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
@@ -84,25 +85,14 @@ export class Dash extends Events.EventEmitter {
 
     private async onMediaData(fregmengId: number, data: Buffer): Promise<void> {
         const configInfo: config.TListenConfig = config.getConfig();
-        const fregmentId: number = Math.floor(Date.now() / 1000);
-        const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentId}.mp3`;
+        const md5 = crypto.createHash('md5');
+        const cryptedFregmentId: string = md5.update(`${configInfo.salt}_${fregmengId}`).digest('hex');
+        const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${cryptedFregmentId}.mp3`;
 
-        const radioDataItem: TRadioDataItem = radioData.get(this.dashName);
-        radioDataItem.mediaFregment.push(fregmentId);
-        if (radioDataItem.mediaFregment.length >= MAX_CACHE_NUM) {
-            radioDataItem.mediaFregment.shift();
-        }
-
-        const mp3Data: Buffer = await this.encode(`${this.dashName}_${fregmentId}`, data);
+        const mp3Data: Buffer = await this.encode(`${this.dashName}_${cryptedFregmentId}`, data);
 
         await oss.putFile(fileName, mp3Data);
-        let willEmitFregmentId: number;
-        if (1 === radioDataItem.mediaFregment.length) {
-            willEmitFregmentId = fregmentId;
-        } else {
-            willEmitFregmentId = radioDataItem.mediaFregment[radioDataItem.mediaFregment.length - 1];
-        }
-        this.emit(EEvent.MEDIA_FREGMENT, this.dashName, willEmitFregmentId);
+
         this.triggerCDN(fileName);
         await sleep(500);
         this.triggerCDN(fileName);
