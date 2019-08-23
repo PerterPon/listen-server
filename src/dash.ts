@@ -92,10 +92,6 @@ export class Dash extends Events.EventEmitter {
         const mp3Data: Buffer = await this.encode(`${this.dashName}_${cryptedFregmentId}`, data);
 
         await oss.putFile(fileName, mp3Data);
-
-        this.triggerCDN(fileName);
-        await sleep(500);
-        this.triggerCDN(fileName);
     }
 
     private async encode(name: string, data: Buffer): Promise<Buffer> {
@@ -132,7 +128,11 @@ export class Dash extends Events.EventEmitter {
     private async triggerCDN(fileNamePath: string): Promise<void> {
         const configInfo: config.TListenConfig = config.getConfig();
         const cdnUrl: string = `${configInfo.cdnDomain}/${fileNamePath}`;
-        await request(cdnUrl);
+        try {
+            await request(cdnUrl);
+        } catch (e) {
+            
+        }
     }
 
 }
