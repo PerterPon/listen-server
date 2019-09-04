@@ -5,10 +5,10 @@
  * Create: Wed Sep 04 2019 20:43:33 GMT+0800 (中国标准时间)
  */
 
-import * as Cos from 'cos-nodejs-sdk-v5';
+import Cos from 'cos-nodejs-sdk-v5';
 import * as config from 'src/config';
 
-let cos;
+let cos: Cos;
 
 export interface TCOSOption {
   SecretId: string;
@@ -30,7 +30,7 @@ export async function putFile(fileName: string, file: Buffer): Promise<void> {
       Region: configInfo.cos.Region,
       Key: fileName,
       Body: file
-    }, (error: Error, data) => {
+    }, (error: Error, data: any) => {
       if (error) {
         reject(error);
       } else {
