@@ -5,10 +5,10 @@
  * Create: Wed Sep 04 2019 20:43:33 GMT+0800 (中国标准时间)
  */
 
-import Cos from 'cos-nodejs-sdk-v5';
+import * as Cos from 'cos-nodejs-sdk-v5';
 import * as config from 'src/config';
 
-let cos: Cos;
+let cos: any;
 
 export interface TCOSOption {
   SecretId: string;
@@ -19,7 +19,7 @@ export interface TCOSOption {
 
 export async function init(): Promise<void> {
   const configInfo: config.TListenConfig = config.getConfig();
-  cos = new Cos(configInfo.cos);
+  cos = new (Cos as any)(configInfo.cos);
 }
 
 export async function putFile(fileName: string, file: Buffer): Promise<void> {
