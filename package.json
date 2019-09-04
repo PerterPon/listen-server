@@ -17,6 +17,7 @@
 		"ali-oss": "^6.1.1",
 		"chalk": "~2.4.1",
 		"commander": "~2.15.1",
+		"cos-nodejs-sdk-v5": "^2.5.12",
 		"fluent-ffmpeg": "^2.1.2",
 		"fresh-mysql": "^1.0.4",
 		"fs-extra": "~6.0.1",

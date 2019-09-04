@@ -15,7 +15,8 @@ import * as crypto from 'crypto';
 
 import { radioData, radioFirstFregment, TRadioDataItem, TListenFirstFregment } from 'src/data';
 import * as config from 'src/config';
-import * as oss from 'src/oss';
+// import * as oss from 'src/oss';
+import * as cos from 'src/cos';
 import { sleep } from 'src/util';
 
 import { EEvent } from 'src/enum';
@@ -55,7 +56,8 @@ export class Dash extends Events.EventEmitter {
         const configInfo: config.TListenConfig = config.getConfig();
         const fregmentFileName: string = `${this.dashName}.dash`;
         const fileName: string = `${configInfo.ossPrefix}/${this.dashName}/${fregmentFileName}`;
-        await oss.putFile(fileName, firstFregment.data);
+        await cos.putFile(fileName, firstFregment.data);
+        // await oss.putFile(fileName, firstFregment.data);
 
         radioFirstFregment.set(this.dashName, firstFregment);
 
@@ -91,7 +93,8 @@ export class Dash extends Events.EventEmitter {
 
         const mp3Data: Buffer = await this.encode(`${this.dashName}_${cryptedFregmentId}`, data);
 
-        await oss.putFile(fileName, mp3Data);
+        await cos.putFile(fileName, mp3Data);
+        // await oss.putFile(fileName, mp3Data);
     }
 
     private async encode(name: string, data: Buffer): Promise<Buffer> {

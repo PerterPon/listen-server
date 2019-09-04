@@ -10,6 +10,7 @@ import * as oss from 'ali-oss';
 import * as fs from 'fs';
 import { safeLoad } from 'js-yaml';
 import * as _ from 'lodash';
+import { TCOSOption } from './cos';
 
 export interface TListenConfig {
     mpds: {[name: string]: string};
@@ -19,6 +20,7 @@ export interface TListenConfig {
     salt: string;
     shmPath: string;
     cdnDomain: string;
+    cos: TCOSOption;
 }
 
 let config: TListenConfig;

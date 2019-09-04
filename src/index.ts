@@ -5,7 +5,8 @@
  * Create: Sun Jul 07 2019 00:02:56 GMT+0800 (CST)
  */
 
-import * as oss from 'src/oss';
+// import * as oss from 'src/oss';
+import * as cos from 'src/cos';
 import * as wsServer from 'src/ws-server';
 import * as httpsServer from 'src/https-server';
 import * as config from 'src/config';
@@ -15,8 +16,9 @@ import { EEvent } from './enum';
 async function init(): Promise<void> {
     console.log('[MAIN] initing ...');
     await config.init();
-    const configInfo: config.TListenConfig = config.getConfig();
-    await oss.init(configInfo.oss);
+    // const configInfo: config.TListenConfig = config.getConfig();
+    await cos.init();
+    // await oss.init(configInfo.oss);
 }
 
 async function start(): Promise<void> {
