@@ -44,6 +44,7 @@ async function startDashs(): Promise<void> {
 
 async function startDash(name: string, mpd: string): Promise<void> {
     const dash: Dash = new Dash();
+    console.log(mpd);
     await dash.init(name, mpd);
     dash.on(EEvent.MEDIA_FREGMENT, onMediaFregment);
     dash.start();
@@ -54,3 +55,15 @@ async function onMediaFregment(name: string, fregmentId: number): Promise<void> 
 }
 
 start();
+
+process.on('uncaughtException', (e) => {
+    console.error(e.message);
+    console.error(e.stack);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (e = {}) => {
+    console.error(e.message);
+    console.error(e.stack);
+    process.exit(1);
+});
