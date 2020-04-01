@@ -93,7 +93,9 @@ export class Dash extends Events.EventEmitter {
 
         const mp3Data: Buffer = await this.encode(`${this.dashName}_${cryptedFregmentId}`, data);
 
-        await cos.putFile(fileName, mp3Data);
+        const pureData: Buffer = mp3Data.slice(128, mp3Data.length);
+
+        await cos.putFile(fileName, pureData);
         // await oss.putFile(fileName, mp3Data);
     }
 
